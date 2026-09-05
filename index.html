@@ -1,0 +1,829 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Holiday Glam Image Generator</title>
+<style>
+  :root{
+    --sapphire:#168FEA;
+    --deep:#103B63;
+    --black:#171A1E;
+    --silver:#C7CED6;
+    --white:#FFFFFF;
+    --soft:#F5FAFF;
+    --line:#DCE8F2;
+    --muted:#617285;
+    --shadow:0 18px 45px rgba(16,59,99,.12);
+    --radius:20px;
+  }
+
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    font-family:Arial, Helvetica, sans-serif;
+    background:
+      radial-gradient(circle at top right, rgba(22,143,234,.14), transparent 34%),
+      linear-gradient(180deg,#FFFFFF 0%, #F7FBFF 100%);
+    color:var(--black);
+    min-height:100vh;
+  }
+
+  .app{
+    width:min(1180px, 94%);
+    margin:0 auto;
+    padding:28px 0 48px;
+  }
+
+  .hero{
+    background:linear-gradient(135deg,#FFFFFF 0%,#F3FAFF 55%,#EAF6FF 100%);
+    border:1px solid rgba(22,143,234,.16);
+    box-shadow:var(--shadow);
+    border-radius:28px;
+    padding:28px;
+    position:relative;
+    overflow:hidden;
+  }
+
+  .hero:after{
+    content:"";
+    position:absolute;
+    right:-70px;
+    top:-70px;
+    width:220px;
+    height:220px;
+    border-radius:50%;
+    background:linear-gradient(135deg,rgba(22,143,234,.20),rgba(199,206,214,.25));
+    filter:blur(1px);
+  }
+
+  .eyebrow{
+    text-transform:uppercase;
+    letter-spacing:.16em;
+    font-size:.78rem;
+    font-weight:800;
+    color:var(--sapphire);
+    margin-bottom:8px;
+  }
+
+  h1{
+    margin:0;
+    font-size:clamp(2rem,5vw,4rem);
+    line-height:.98;
+    color:var(--deep);
+    letter-spacing:-.04em;
+    max-width:780px;
+  }
+
+  .hero p{
+    margin:16px 0 0;
+    max-width:760px;
+    color:var(--muted);
+    font-size:1rem;
+    line-height:1.65;
+  }
+
+  .toolbar{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+    margin-top:20px;
+  }
+
+  button{
+    appearance:none;
+    border:0;
+    border-radius:999px;
+    padding:12px 18px;
+    font-weight:800;
+    font-size:.95rem;
+    cursor:pointer;
+    transition:.2s ease;
+  }
+
+  button:hover{transform:translateY(-1px)}
+  button:active{transform:translateY(0)}
+
+  .btn-primary{
+    background:linear-gradient(135deg,var(--sapphire),#55B7FF);
+    color:white;
+    box-shadow:0 10px 24px rgba(22,143,234,.25);
+  }
+
+  .btn-dark{
+    background:var(--deep);
+    color:white;
+  }
+
+  .btn-light{
+    background:white;
+    color:var(--deep);
+    border:1px solid var(--line);
+  }
+
+  .layout{
+    display:grid;
+    grid-template-columns:minmax(0,1.35fr) minmax(320px,.65fr);
+    gap:22px;
+    margin-top:22px;
+  }
+
+  .panel{
+    background:rgba(255,255,255,.96);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    box-shadow:var(--shadow);
+    padding:22px;
+  }
+
+  .panel h2{
+    margin:0 0 6px;
+    color:var(--deep);
+    font-size:1.2rem;
+  }
+
+  .panel-sub{
+    color:var(--muted);
+    font-size:.9rem;
+    margin-bottom:20px;
+  }
+
+  .grid{
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:16px;
+  }
+
+  .field{
+    display:flex;
+    flex-direction:column;
+    gap:7px;
+  }
+
+  .field.full{grid-column:1/-1}
+
+  label{
+    font-weight:800;
+    font-size:.88rem;
+    color:var(--deep);
+  }
+
+  select, textarea{
+    width:100%;
+    border:1px solid var(--line);
+    background:#FBFDFF;
+    color:var(--black);
+    border-radius:14px;
+    padding:12px 13px;
+    font-size:.95rem;
+    outline:none;
+    transition:.2s ease;
+  }
+
+  select:focus, textarea:focus{
+    border-color:var(--sapphire);
+    box-shadow:0 0 0 3px rgba(22,143,234,.10);
+  }
+
+  textarea{
+    min-height:110px;
+    resize:vertical;
+  }
+
+  .output-wrap{
+    position:sticky;
+    top:16px;
+  }
+
+  .output{
+    min-height:420px;
+    border:1px solid rgba(22,143,234,.2);
+    border-radius:18px;
+    background:
+      linear-gradient(180deg,#FFFFFF 0%,#F6FBFF 100%);
+    padding:18px;
+    color:#24313E;
+    line-height:1.7;
+    white-space:pre-wrap;
+    overflow:auto;
+    box-shadow:inset 0 0 0 1px rgba(255,255,255,.7);
+  }
+
+  .placeholder{
+    color:#8493A1;
+  }
+
+  .output-actions{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    margin-top:14px;
+  }
+
+  .holiday-note{
+    margin-top:12px;
+    padding:12px 14px;
+    border-radius:14px;
+    background:linear-gradient(135deg,rgba(22,143,234,.08),rgba(199,206,214,.12));
+    color:var(--deep);
+    font-size:.88rem;
+    border:1px solid rgba(22,143,234,.10);
+  }
+
+  .footer{
+    text-align:center;
+    color:#7A8896;
+    font-size:.78rem;
+    margin-top:18px;
+  }
+
+  @media (max-width:900px){
+    .layout{grid-template-columns:1fr}
+    .output-wrap{position:static}
+  }
+
+  @media (max-width:640px){
+    .app{width:min(94%, 640px); padding-top:14px}
+    .hero{padding:22px 18px}
+    .panel{padding:18px}
+    .grid{grid-template-columns:1fr}
+    .field.full{grid-column:auto}
+    .toolbar button,.output-actions button{width:100%}
+    h1{font-size:2.3rem}
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <section class="hero">
+    <div class="eyebrow">Holiday Glam Image Generator</div>
+    <h1>Make polished holiday image prompts without writing prompts from scratch.</h1>
+    <p>Pick your holiday, build your look, choose the mood, and generate one complete image prompt ready to paste into your favorite image generator.</p>
+
+    <div class="toolbar">
+      <button class="btn-primary" id="generateTop">Generate Prompt</button>
+      <button class="btn-light" id="surpriseTop">Surprise Me</button>
+      <button class="btn-light" id="randomTop">Randomize</button>
+      <button class="btn-dark" id="clearTop">Clear All</button>
+    </div>
+  </section>
+
+  <div class="layout">
+    <section class="panel">
+      <h2>Build Your Holiday Image</h2>
+      <div class="panel-sub">Choose only what you want. The generator will turn your selections into polished natural wording.</div>
+
+      <div class="grid">
+        <div class="field">
+          <label for="holiday">Holiday</label>
+          <select id="holiday">
+            <option value="">Choose a holiday</option>
+            <option>Halloween</option>
+            <option>Thanksgiving</option>
+            <option>Christmas</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="holidayTheme">Holiday Theme</label>
+          <select id="holidayTheme">
+            <option value="">Choose a holiday first</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="imageType">Image Type</label>
+          <select id="imageType">
+            <option value="">Choose image type</option>
+            <option>Portrait</option>
+            <option>Product Shot</option>
+            <option>Social Media Graphic</option>
+            <option>Lifestyle Scene</option>
+            <option>Character Image</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="character">Character</label>
+          <select id="character">
+            <option value="">Choose character</option>
+            <option>Woman</option>
+            <option>Man</option>
+            <option>Couple</option>
+            <option>Family</option>
+            <option>No Person</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="bodyType">Body Type</label>
+          <select id="bodyType">
+            <option value="">Choose body type</option>
+            <option>Petite</option>
+            <option>Slim</option>
+            <option>Average</option>
+            <option>Curvy</option>
+            <option>Plus-size</option>
+            <option>Athletic</option>
+            <option>Tall</option>
+            <option>Full-figured</option>
+            <option>Not Applicable</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="ageRange">Age Range</label>
+          <select id="ageRange">
+            <option value="">Choose age range</option>
+            <option>20s</option>
+            <option>30s</option>
+            <option>40s</option>
+            <option>50s</option>
+            <option>60s+</option>
+            <option>Mixed Ages</option>
+            <option>Not Applicable</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="skinTone">Skin Tone</label>
+          <select id="skinTone">
+            <option value="">Choose skin tone</option>
+            <option>Deep</option>
+            <option>Rich Brown</option>
+            <option>Medium Brown</option>
+            <option>Golden Brown</option>
+            <option>Warm Tan</option>
+            <option>Olive</option>
+            <option>Fair</option>
+            <option>Very Fair</option>
+            <option>Mixed / Diverse</option>
+            <option>Not Applicable</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="hairStyle">Hair Style</label>
+          <select id="hairStyle">
+            <option value="">Choose hair style</option>
+            <option>Long Glam Waves</option>
+            <option>Short Pixie</option>
+            <option>Curly Bob</option>
+            <option>Silk Press</option>
+            <option>Locs</option>
+            <option>Braids</option>
+            <option>Natural Curls</option>
+            <option>High Ponytail</option>
+            <option>Elegant Updo</option>
+            <option>Bald / Shaved</option>
+            <option>Not Applicable</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="outfitStyle">Outfit Style</label>
+          <select id="outfitStyle">
+            <option value="">Choose outfit style</option>
+            <option>Luxury Glam</option>
+            <option>Casual Chic</option>
+            <option>Cozy Lounge</option>
+            <option>Elegant Evening</option>
+            <option>Festive Party Look</option>
+            <option>Fall Fashion</option>
+            <option>Holiday Pajamas</option>
+            <option>Statement Dress</option>
+            <option>Classic Suit</option>
+            <option>Not Applicable</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="setting">Setting</label>
+          <select id="setting">
+            <option value="">Choose setting</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="palette">Color Palette</label>
+          <select id="palette">
+            <option value="">Choose color palette</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="props">Props</label>
+          <select id="props">
+            <option value="">Choose props</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="mood">Mood / Vibe</label>
+          <select id="mood">
+            <option value="">Choose mood</option>
+            <option>Luxury & Polished</option>
+            <option>Cozy & Warm</option>
+            <option>Playful & Fun</option>
+            <option>Bold & Dramatic</option>
+            <option>Soft & Feminine</option>
+            <option>Editorial & Fashion-Forward</option>
+            <option>Whimsical</option>
+            <option>Elegant & Refined</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="lighting">Lighting</label>
+          <select id="lighting">
+            <option value="">Choose lighting</option>
+            <option>Bright Studio Lighting</option>
+            <option>Soft Window Light</option>
+            <option>Golden Hour Glow</option>
+            <option>Warm Candlelight</option>
+            <option>Moody Cinematic Light</option>
+            <option>Soft Diffused Glow</option>
+            <option>Twinkle Light Glow</option>
+            <option>Snowy Daylight</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="imageStyle">Image Style</label>
+          <select id="imageStyle">
+            <option value="">Choose image style</option>
+            <option>Photorealistic</option>
+            <option>Luxury Editorial</option>
+            <option>Glossy Commercial</option>
+            <option>High-Fashion Campaign</option>
+            <option>Cozy Lifestyle Photography</option>
+            <option>Storybook Realism</option>
+            <option>3D Glam Illustration</option>
+            <option>Cinematic Realism</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="camera">Camera / Composition</label>
+          <select id="camera">
+            <option value="">Choose composition</option>
+            <option>Full-body centered portrait</option>
+            <option>Waist-up portrait</option>
+            <option>Close-up beauty shot</option>
+            <option>Wide lifestyle scene</option>
+            <option>Product hero composition</option>
+            <option>Editorial off-center composition</option>
+            <option>Top-down flat lay</option>
+            <option>Shallow depth of field</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="chaos">Holiday Chaos Level</label>
+          <select id="chaos">
+            <option value="">Choose chaos level</option>
+            <option>Calm & Cute</option>
+            <option>A Little Extra</option>
+            <option>Full Holiday Drama</option>
+            <option>Somebody Come Get Your Auntie</option>
+          </select>
+        </div>
+
+        <div class="field full">
+          <label for="details">Add Your Own Details</label>
+          <textarea id="details" placeholder="Add anything extra you want included, such as a specific product, hairstyle, pose, text on a shirt, background detail, holiday activity, or business theme."></textarea>
+        </div>
+      </div>
+
+      <div class="holiday-note" id="holidayNote">
+        Choose Halloween, Thanksgiving, or Christmas and the holiday-specific options will update automatically.
+      </div>
+
+      <div class="toolbar">
+        <button class="btn-primary" id="generateBottom">Generate Prompt</button>
+        <button class="btn-light" id="surpriseBottom">Surprise Me</button>
+        <button class="btn-light" id="randomBottom">Randomize</button>
+        <button class="btn-dark" id="clearBottom">Clear All</button>
+      </div>
+    </section>
+
+    <aside class="panel output-wrap">
+      <h2>Your Finished Prompt</h2>
+      <div class="panel-sub">Copy this prompt and paste it directly into your image generator.</div>
+
+      <div class="output" id="output">
+        <span class="placeholder">Your polished holiday image prompt will appear here.</span>
+      </div>
+
+      <div class="output-actions">
+        <button class="btn-primary" id="copyPrompt">Copy Prompt</button>
+        <button class="btn-light" id="surpriseOutput">Surprise Me</button>
+        <button class="btn-dark" id="clearOutput">Clear All</button>
+      </div>
+    </aside>
+  </div>
+
+  <div class="footer">Holiday Glam Image Generator • Self-contained HTML/CSS/JS</div>
+</div>
+
+<script>
+const holidayData = {
+  Halloween: {
+    themes:["Spooky Glam","Cute Spooky","Witchy","Haunted Mansion","Pumpkins","Candy","Gothic Glam","Fall Fashion"],
+    settings:[
+      "Elegant haunted mansion interior",
+      "Pumpkin-filled front porch",
+      "Moody gothic ballroom",
+      "Chic Halloween studio set",
+      "Foggy autumn garden",
+      "Luxury candy table",
+      "Candlelit staircase",
+      "Stylish fall city street"
+    ],
+    palettes:[
+      "Black, sapphire blue, silver, and white",
+      "Pumpkin orange, black, cream, and gold",
+      "Deep plum, black, silver, and smoke gray",
+      "Candy pink, lavender, black, and white",
+      "Rust, caramel, cream, and black",
+      "Emerald, black, silver, and candlelight gold"
+    ],
+    props:[
+      "Pumpkins and elegant candles",
+      "Luxury candy bowls",
+      "Black lace and velvet accents",
+      "Decorative broom and potion bottles",
+      "Autumn leaves and lanterns",
+      "Chrome skull decor",
+      "Glam masquerade mask",
+      "No extra props"
+    ]
+  },
+  Thanksgiving: {
+    themes:["Cozy Fall","Friendsgiving","Family Dinner","Harvest Glam","Thanksgiving Table","Fall Kitchen","Football Sunday","Autumn Portrait"],
+    settings:[
+      "Warm modern dining room",
+      "Elegant Thanksgiving table",
+      "Bright fall kitchen",
+      "Cozy living room with autumn decor",
+      "Outdoor harvest table",
+      "Stylish Friendsgiving loft",
+      "Game-day family room",
+      "Autumn park with golden leaves"
+    ],
+    palettes:[
+      "Caramel, cream, copper, and warm brown",
+      "Sapphire blue, silver, white, and deep brown",
+      "Terracotta, cream, olive, and gold",
+      "Pumpkin, burgundy, tan, and ivory",
+      "Chocolate brown, champagne, cream, and copper",
+      "Rust, amber, beige, and dark green"
+    ],
+    props:[
+      "Harvest centerpiece and candles",
+      "Pumpkin pie and serving dishes",
+      "Roasted turkey and elegant tableware",
+      "Cozy throws and autumn pillows",
+      "Mini pumpkins and fall florals",
+      "Football snacks and game-day decor",
+      "Wooden serving boards",
+      "No extra props"
+    ]
+  },
+  Christmas: {
+    themes:["Luxury Christmas","Cozy Christmas","Sapphire Christmas","Pink Christmas","Christmas Pajamas","Gift Wrapping","Holiday Party","Snowy Winter Scene"],
+    settings:[
+      "Luxury Christmas living room",
+      "Bright snowy window scene",
+      "Elegant gift-wrapping studio",
+      "Modern holiday party setting",
+      "Cozy fireplace room",
+      "Sapphire-and-silver Christmas tree scene",
+      "Pink glam holiday room",
+      "Snow-covered outdoor walkway"
+    ],
+    palettes:[
+      "Caribbean sapphire, silver, white, and deep sapphire",
+      "Classic red, white, evergreen, and gold",
+      "Blush pink, silver, white, and champagne",
+      "Emerald, black, white, and metallic gold",
+      "Ice blue, silver, white, and crystal tones",
+      "Burgundy, cream, pine green, and gold"
+    ],
+    props:[
+      "Wrapped gifts and satin ribbon",
+      "Elegant Christmas ornaments",
+      "Sapphire-and-silver baubles",
+      "Hot cocoa and cozy blankets",
+      "Gift boxes and wrapping paper",
+      "Twinkle lights and garland",
+      "Snowflakes and winter branches",
+      "No extra props"
+    ]
+  }
+};
+
+const allSelectIds = [
+  "holiday","holidayTheme","imageType","character","bodyType","ageRange","skinTone",
+  "hairStyle","outfitStyle","setting","palette","props","mood","lighting","imageStyle","camera","chaos"
+];
+
+const $ = id => document.getElementById(id);
+
+function fillSelect(id, items, placeholder){
+  const select = $(id);
+  select.innerHTML = "";
+  const first = document.createElement("option");
+  first.value = "";
+  first.textContent = placeholder;
+  select.appendChild(first);
+
+  items.forEach(item=>{
+    const opt = document.createElement("option");
+    opt.value = item;
+    opt.textContent = item;
+    select.appendChild(opt);
+  });
+}
+
+function updateHolidayOptions(){
+  const holiday = $("holiday").value;
+  if(!holiday || !holidayData[holiday]){
+    fillSelect("holidayTheme",[],"Choose a holiday first");
+    fillSelect("setting",[],"Choose a holiday first");
+    fillSelect("palette",[],"Choose a holiday first");
+    fillSelect("props",[],"Choose a holiday first");
+    $("holidayNote").textContent = "Choose Halloween, Thanksgiving, or Christmas and the holiday-specific options will update automatically.";
+    return;
+  }
+
+  const data = holidayData[holiday];
+  fillSelect("holidayTheme",data.themes,"Choose holiday theme");
+  fillSelect("setting",data.settings,"Choose setting");
+  fillSelect("palette",data.palettes,"Choose color palette");
+  fillSelect("props",data.props,"Choose props");
+  $("holidayNote").textContent = `${holiday} mode is active. Theme, setting, palette, and props now match this holiday.`;
+}
+
+function selected(id){
+  const value = $(id).value.trim();
+  return value && value !== "Not Applicable" ? value : "";
+}
+
+function chaosDescription(level){
+  const map = {
+    "Calm & Cute":"keep the holiday styling controlled, charming, balanced, and tasteful with only a few festive details",
+    "A Little Extra":"make the scene noticeably festive with layered holiday styling, playful details, and polished visual interest",
+    "Full Holiday Drama":"push the holiday styling into a bold, dramatic, richly decorated scene while keeping the final image polished and intentional",
+    "Somebody Come Get Your Auntie":"go delightfully over-the-top with expressive holiday energy, playful excess, dramatic festive styling, and memorable personality while keeping the image visually polished"
+  };
+  return map[level] || "";
+}
+
+function buildPrompt(){
+  const holiday = selected("holiday");
+  const theme = selected("holidayTheme");
+  const imageType = selected("imageType");
+  const character = selected("character");
+  const bodyType = selected("bodyType");
+  const ageRange = selected("ageRange");
+  const skinTone = selected("skinTone");
+  const hairStyle = selected("hairStyle");
+  const outfitStyle = selected("outfitStyle");
+  const setting = selected("setting");
+  const palette = selected("palette");
+  const props = selected("props");
+  const mood = selected("mood");
+  const lighting = selected("lighting");
+  const imageStyle = selected("imageStyle");
+  const camera = selected("camera");
+  const chaos = selected("chaos");
+  const details = $("details").value.trim();
+
+  if(!holiday){
+    $("output").innerHTML = '<span class="placeholder">Choose a holiday first, then generate your prompt.</span>';
+    return;
+  }
+
+  const parts = [];
+
+  let opening = `Create a polished ${holiday} image`;
+  if(theme) opening += ` with a ${theme} direction`;
+  if(imageType) opening += ` as a ${imageType.toLowerCase()}`;
+  opening += ".";
+  parts.push(opening);
+
+  if(character && character !== "No Person"){
+    let person = `Feature ${character === "Woman" ? "an adult woman" : character === "Man" ? "an adult man" : character.toLowerCase()}`;
+    const descriptors = [];
+    if(ageRange) descriptors.push(`in the ${ageRange} age range`);
+    if(bodyType) descriptors.push(`with a ${bodyType.toLowerCase()} body type`);
+    if(skinTone) descriptors.push(`${skinTone.toLowerCase()} skin tone`);
+    if(hairStyle) descriptors.push(`${hairStyle.toLowerCase()} hair`);
+    if(outfitStyle) descriptors.push(`styled in a ${outfitStyle.toLowerCase()} outfit`);
+    if(descriptors.length) person += ", " + descriptors.join(", ");
+    person += ". Keep adult subjects looking like adults and preserve the requested body type and proportions.";
+    parts.push(person);
+  } else if(character === "No Person"){
+    parts.push("Do not include any people in the image; let the holiday scene, product, or setting be the visual focus.");
+  }
+
+  if(setting) parts.push(`Place the scene in ${setting.charAt(0).toLowerCase()+setting.slice(1)}.`);
+  if(palette) parts.push(`Use a ${palette.toLowerCase()} color palette with clean color separation and refined holiday coordination.`);
+  if(props && props !== "No extra props") parts.push(`Include ${props.charAt(0).toLowerCase()+props.slice(1)} as supporting details without overcrowding the composition.`);
+  if(mood) parts.push(`The overall mood should feel ${mood.toLowerCase()}.`);
+  if(lighting) parts.push(`Use ${lighting.toLowerCase()} with flattering highlights, realistic depth, and clean detail.`);
+  if(imageStyle) parts.push(`Render the final image in a ${imageStyle.toLowerCase()} style with premium, realistic finishing.`);
+  if(camera) parts.push(`Compose the image as a ${camera.charAt(0).toLowerCase()+camera.slice(1)}, with strong visual hierarchy and an intentional focal point.`);
+  if(chaos) parts.push(`For the holiday chaos level, ${chaosDescription(chaos)}.`);
+
+  if(details) parts.push(`Also include these custom details: ${details}.`);
+
+  parts.push("Keep the final image bright, elegant, modern, polished, uncluttered, and visually cohesive. Use realistic materials, clean reflections, refined textures, controlled shine, and professional composition. Avoid crowns, tiaras, fake dashboards, HUD graphics, analytics panels, futuristic interfaces, random charts, excessive icons, or unrelated clutter. Make all visible text, if any, correctly spelled, fully visible, unobstructed, and easy to read.");
+
+  $("output").textContent = parts.join(" ");
+}
+
+function randomOption(id){
+  const select = $(id);
+  if(select.options.length <= 1) return;
+  const index = Math.floor(Math.random() * (select.options.length - 1)) + 1;
+  select.selectedIndex = index;
+}
+
+function randomizeAll(){
+  if(!$("holiday").value) randomOption("holiday");
+  updateHolidayOptions();
+  allSelectIds.filter(id=>id!=="holiday").forEach(randomOption);
+  buildPrompt();
+}
+
+function surpriseMe(){
+  $("holiday").selectedIndex = Math.floor(Math.random()*3)+1;
+  updateHolidayOptions();
+  allSelectIds.filter(id=>id!=="holiday").forEach(randomOption);
+
+  const customIdeas = {
+    Halloween:[
+      "Add one elegant sapphire butterfly as a subtle signature detail.",
+      "Include a polished luxury handbag and a dramatic front-door pose.",
+      "Add a playful candy moment with upscale styling."
+    ],
+    Thanksgiving:[
+      "Include a candid laughing moment that feels warm and natural.",
+      "Add a beautifully styled dessert table with premium details.",
+      "Include cozy layered textures and polished fall accessories."
+    ],
+    Christmas:[
+      "Add one elegant sapphire butterfly as a subtle signature detail.",
+      "Include glossy gift boxes with metallic silver ribbon.",
+      "Add a luxurious tree-side pose with realistic ornament reflections."
+    ]
+  };
+  const h = $("holiday").value;
+  const extras = customIdeas[h];
+  $("details").value = extras[Math.floor(Math.random()*extras.length)];
+  buildPrompt();
+}
+
+function clearAll(){
+  allSelectIds.forEach(id=>$(id).selectedIndex=0);
+  $("details").value = "";
+  updateHolidayOptions();
+  $("output").innerHTML = '<span class="placeholder">Your polished holiday image prompt will appear here.</span>';
+}
+
+async function copyPrompt(){
+  const text = $("output").innerText.trim();
+  if(!text || text.includes("Your polished holiday image prompt will appear here") || text.includes("Choose a holiday first")){
+    return;
+  }
+  try{
+    await navigator.clipboard.writeText(text);
+    const btn = $("copyPrompt");
+    const old = btn.textContent;
+    btn.textContent = "Copied!";
+    setTimeout(()=>btn.textContent=old,1400);
+  }catch(err){
+    const range = document.createRange();
+    range.selectNodeContents($("output"));
+    const sel = window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(range);
+    document.execCommand("copy");
+    sel.removeAllRanges();
+  }
+}
+
+$("holiday").addEventListener("change",updateHolidayOptions);
+
+["generateTop","generateBottom"].forEach(id=>$(id).addEventListener("click",buildPrompt));
+["randomTop","randomBottom"].forEach(id=>$(id).addEventListener("click",randomizeAll));
+["surpriseTop","surpriseBottom","surpriseOutput"].forEach(id=>$(id).addEventListener("click",surpriseMe));
+["clearTop","clearBottom","clearOutput"].forEach(id=>$(id).addEventListener("click",clearAll));
+$("copyPrompt").addEventListener("click",copyPrompt);
+
+updateHolidayOptions();
+</script>
+</body>
+</html>
